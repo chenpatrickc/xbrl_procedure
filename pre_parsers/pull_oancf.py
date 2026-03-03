@@ -156,7 +156,7 @@ def get_href_by_label(tree, label):
     return locs[0].get("{http://www.w3.org/1999/xlink}href").split("#")[-1]
 
 
-url = "https://www.sec.gov/Archives/edgar/data/75208/000007520819000020/osgiq-20181231_pre.xml"
+url = "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml"
 response = fetch_response(url)
 tree = format_tree(response)
 role = isolate_cashflow_presentationLink(tree)
