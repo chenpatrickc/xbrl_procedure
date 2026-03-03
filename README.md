@@ -15,13 +15,14 @@ First, we must identify the correct tag that the Company uses to obtain our line
 
 To run the code:
 
-`python pull_oancf.py --user <email_address> --url <url>`
+```bash
+python pull_oancf.py --user <email_address> --url <url>
 
-or
+#or
 
-`python pull_oancf.py`, interative terminal prompts will request inputs for email address and URL.
+#interative terminal prompts will request inputs for email address and URL.
+python pull_oancf.py
+```
 
-Example output at url `https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml`:
+Example output at url [https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml](https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml):
 `**The XBRL tag corresponding to the Operating Cash Flow line item as-filed is: us-gaap_NetCashProvidedByUsedInOperatingActivities`
-
-Sending a request to SEC EDGAR requires users to declear their User-Agent by leaving down an email address. You will not be emailed.
