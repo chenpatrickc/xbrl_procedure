@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Take a presentation linkbase url link and pull the oancf value as presented on the Statement of Cash Flows
+Take a presentation linkbase url link and pull the oancf tag that identifies the line item as presented on the Statement of Cash Flows
 
 Usage:
-  python pull_oancf.py https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml
+  python pull_oancf.py <email_address> https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml
 """
 
+import argparse
+import sys
 import requests
 from requests.exceptions import HTTPError
 from lxml import etree
@@ -18,9 +20,9 @@ NS = {
     "xlink": XLINK_NS
 }
 
-def fetch_response(url):
+def fetch_response(user, url):
 
-    headers = {"User-Agent": "patrick.chen3@marshall.usc.edu",
+    headers = {"User-Agent": user,
           "Accept-Encoding": "gzip, deflate",
           "Host": "www.sec.gov"
           }
@@ -31,7 +33,7 @@ def fetch_response(url):
         return response
     
     except HTTPError as http_err:
-        print(f'HTTP error occurred: {http_err}') # Includes details of the failed request
+        print(f'HTTP error occurred: {http_err}')
     except Exception as err:
         print(f'An error occurred: {err}')
 
@@ -112,7 +114,7 @@ def find_operating_to(tree, from_label):
     operating_targets = []
 
     for arc in arcs:
-        to_label = arc.get("{http://www.w3.org/1999/xlink}to")
+        to_label = arc.get(f"{{{XLINK_NS}}}to")
         if to_label and "operating" in to_label.lower():
             operating_targets.append(to_label)
 
@@ -138,7 +140,7 @@ def max_order_child(tree, operating_target):
         key=lambda arc: float(arc.get("order", "0"))
     )
 
-    return max_arc.get("{http://www.w3.org/1999/xlink}to")
+    return max_arc.get(f"{{{XLINK_NS}}}to")
 
 def get_href_by_label(tree, label):
     """
@@ -153,16 +155,35 @@ def get_href_by_label(tree, label):
     if not locs:
         return None
 
-    return locs[0].get("{http://www.w3.org/1999/xlink}href").split("#")[-1]
+    return locs[0].get(f"{{{XLINK_NS}}}href").split("#")[-1]
 
 
-url = "https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml"
-response = fetch_response(url)
-tree = format_tree(response)
-role = isolate_cashflow_presentationLink(tree)
-root = identify_root_locator(tree, role)
-xlink_to = find_operating_to(tree, root)
-label = max_order_child(tree, xlink_to)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--user", type=str, help="email for EDGAR User-Agent header declaration (you will not be emailed)")
+    parser.add_argument("--url", type=str, help="URL of presentation linkbase from EDGAR")
+    args = parser.parse_args()
 
-oancf_tag = get_href_by_label(tree, label)
-print(oancf_tag)
+    if not args.user:
+        args.user = input("Please enter email for EDGAR User-Agent header declaration (you will not be emailed): ")
+    
+    if not args.url:
+        args.url = input("Please enter URL of presentation linkbase from EDGAR: ")
+    
+    if not args.user or not args.url:
+        raise ValueError("Both email and URL must be provided.")
+
+    url_response = fetch_response(args.user, args.url)
+    formatted_tree = format_tree(url_response)
+    cashflow_presentationLink = isolate_cashflow_presentationLink(formatted_tree)
+    root_node = identify_root_locator(formatted_tree, cashflow_presentationLink)
+    xlink_to = find_operating_to(formatted_tree, root_node)
+    label = max_order_child(formatted_tree, xlink_to)
+    oancf_tag = get_href_by_label(formatted_tree, label)
+
+    print(f"**The XBRL tag corresponding to the Operating Cash Flow line item as-filed is: {oancf_tag}")
+    return(oancf_tag)
+
+
+if __name__ == "__main__":
+    main()
