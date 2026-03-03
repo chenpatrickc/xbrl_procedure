@@ -24,5 +24,6 @@ python pull_oancf.py --user <email_address> --url <url>
 python pull_oancf.py
 ```
 
-Example output at url [https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml](https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml):
+Example output using url [https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml](https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927_pre.xml):
+
 `**The XBRL tag corresponding to the Operating Cash Flow line item as-filed is: us-gaap_NetCashProvidedByUsedInOperatingActivities`
