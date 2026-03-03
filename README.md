@@ -2,7 +2,7 @@ Best Practices on leveraging XBRL files to obtain financial information
 
 First, we must identify the correct tag that the Company uses to obtain our line item of interest. To do so, we will leverage the presentation linkbase.
 
-Procedure:
+Procedure for oancf:
 
 1. Search through "link:presentationLink" elements that contain "CashFlow" in the "xlink:role"
 2. To verify we have identified the right "presentationLink" element, check if there is a "loc" element within the "presentationLink" that contains the word "Operating", "Investing", and "Financing"
